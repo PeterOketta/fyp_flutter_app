@@ -6,9 +6,8 @@ import 'device_screen.dart';
 import '../utils/snackbar.dart';
 import '../widgets/system_device_tile.dart';
 import '../widgets/scan_result_tile.dart';
-import '../utils/extra.dart';
 import 'ecg_data_screen.dart';
-
+import '../utils/BluetoothUtils.dart';
 class ScanScreen extends StatefulWidget {
   const ScanScreen({Key? key}) : super(key: key);
 
@@ -23,7 +22,7 @@ class _ScanScreenState extends State<ScanScreen> {
   late StreamSubscription<List<ScanResult>> _scanResultsSubscription;
   late StreamSubscription<bool> _isScanningSubscription;
 
-  List<int> _parsedECGSamples = [];
+  final List<int> _parsedECGSamples = [];
 
   @override
   void initState() {
@@ -90,66 +89,15 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  Future<void> _connectToDevice(BluetoothDevice device) async {
-    try {
-      await device.connect();
-      print('Connected to device: ${device.name}');
-      List<BluetoothService> services = await device.discoverServices();
-
-      for (BluetoothService service in services) {
-        for (BluetoothCharacteristic characteristic
-            in service.characteristics) {
-          if (characteristic.uuid.toString() ==
-              "b7981234-6189-d7a6-5241-39acc25f2471") {
-            await characteristic.setNotifyValue(true);
-
-            // Set a flag to control the duration of the connection
-            bool shouldContinue = true;
-
-            // Start a timer to disconnect after a specific duration (e.g., 60 seconds)
-            Future.delayed(const Duration(seconds: 10), () {
-              shouldContinue = false;
-              device.disconnect();
-            });
-
-            characteristic.lastValueStream.listen((List<int>? value) {
-              if (shouldContinue && value != null) {
-                print('Receiving data');
-                List<int> parsedSamples = _parseECGData(value);
-                _updateECGSamples(parsedSamples);
-              }
-            }, onError: (error) {
-              print('Error in characteristic value stream: $error');
-            });
-          }
-        }
-      }
-    } catch (e) {
-      _showErrorSnackbar("Connect Error:", e);
-    }
+  void _findTargetCharacteristic(BluetoothDevice device) async {
+    BluetoothUtils utils = BluetoothUtils(); // Create an instance
+    await utils.findTargetCharacteristic(device);
+  }
+  Future<List<int>> _collectECGData(Duration duration, BluetoothCharacteristic characteristic) async {
+    BluetoothUtils utils = BluetoothUtils(); // Create an instance if needed
+    return await utils.collectDataFromCharacteristic(duration, characteristic);
   }
 
-  List<int> _parseECGData(List<int> rawData) {
-    rawData = rawData.sublist(1);
-    print("Raw ECG data: $rawData");
-
-    List<int> parsedSamples = [];
-    for (int i = 0; i < rawData.length; i += 2) {
-      int sample = (rawData[i] & 0xFF) | ((rawData[i + 1] & 0xFF) << 8);
-      parsedSamples.add(sample);
-    }
-
-    return parsedSamples;
-  }
-
-  void _updateECGSamples(List<int> samples) {
-    if (samples.isNotEmpty) {
-      print("Updating ECG samples: $samples");
-      setState(() {
-        _parsedECGSamples.addAll(samples);
-      });
-    }
-  }
 
   Future<void> _onRefresh() async {
     if (!_isScanning) {
@@ -180,19 +128,31 @@ class _ScanScreenState extends State<ScanScreen> {
           (d) => SystemDeviceTile(
             device: d,
             onOpen: () => _navigateToDeviceScreen(d),
-            onConnect: () => _connectToDevice(d),
+            onConnect: () => _findTargetCharacteristic(d),
           ),
         )
         .toList();
   }
 
-  void _navigateToDeviceScreen(BluetoothDevice device) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => DeviceScreen(device: device),
-        settings: RouteSettings(name: '/DeviceScreen'),
-      ),
-    );
+  void _navigateToDeviceScreen(BluetoothDevice device) async {
+    try {
+      await device.connect(); // Ensure connection
+      BluetoothUtils utils = BluetoothUtils();
+      BluetoothCharacteristic? characteristic = await utils.findTargetCharacteristic(device);
+
+      if (characteristic != null) {
+        Navigator.of(context).pushNamed(
+            '/enroll',  // Or your enrollment screen route
+            arguments: {'characteristic': characteristic}
+        );
+      } else {
+        // Handle the case where the characteristic couldn't be found
+        Snackbar.show(ABC.b, "Charasteristic not found", success: false);
+      }
+
+    } catch(e) {
+      _showErrorSnackbar("Device Screen Error:", e);
+    }
   }
 
   void _navigateToECGDataScreen() {
@@ -213,7 +173,7 @@ class _ScanScreenState extends State<ScanScreen> {
     return filteredScanResults
         .map((r) => ScanResultTile(
               result: r,
-              onTap: () => _connectToDevice(r.device),
+              onTap: () => _findTargetCharacteristic(r.device),
             ))
         .toList();
   }

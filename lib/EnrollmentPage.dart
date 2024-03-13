@@ -1,55 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'Enrollment_functions.dart';
 
-class EnrollmentScreen extends StatelessWidget {
+class EnrollmentScreen extends StatefulWidget {
+  @override
+  _EnrollmentScreenState createState() => _EnrollmentScreenState();
+}
+
+class _EnrollmentScreenState extends State<EnrollmentScreen> {
+  bool _isEnrolling = false;
+  String _enrollmentStatus = 'Ready to Start';
+  BluetoothCharacteristic? _characteristic;
+  final _enrollmentFunctions = EnrollmentFunctions();
+  @override
+  void initState() {
+    super.initState();
+  }
+  void _retrieveCharacteristic() {
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _characteristic = args['characteristic'];
+  }
+
+
+  void _startEnrollment() async {
+    _enrollmentFunctions.enrollUser(80,_updateEnrollmentStatus,_characteristic!);
+    if (_isEnrolling == false) {
+      Navigator.pushReplacementNamed(context, '/profile');
+    }
+  }
+
+  void _updateEnrollmentStatus(bool isEnrolling, String status) {
+    setState(() {
+      _isEnrolling = isEnrolling;
+      _enrollmentStatus = status;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Your app's title or desired content for the app bar
+        title: Text('Create Your ECG Profile'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Title
+            // Instructions
             Text(
-              'Create your ECG Profile',
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-            ),
-
-            SizedBox(height: 20.0),
-
-            // Instructions and Image
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Image.asset('assets/images/sensor_placement.png'), // Replace with your sensor placement image
-                // SizedBox(width: 20.0),
-                Text(
-                  'Place the sensor on your garment as shown.',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 20.0),
-            // Bluetooth Connection Status
-            Text(
-              'Bluetooth: Connected', // Update dynamically based on connection state
+              'Place the sensor on your garment as shown.',
               style: TextStyle(fontSize: 16.0),
             ),
 
             SizedBox(height: 20.0),
-            // Start Enrollment Button
-            ElevatedButton(
-              onPressed: () {
-                // Start ECG data capture process
-                // ... (e.g., call function to capture data)
-                Navigator.pushNamed(context, '/profile', arguments: {'profileName': 'Mike'});
 
-              },
-              child: Text('Start Enrollment'),
+            // Bluetooth Status (Update based on real status)
+            Text(
+              'Bluetooth: Connected',
+              style: TextStyle(fontSize: 16.0),
             ),
+
+            SizedBox(height: 20.0),
+
+            // Enrollment Button
+            ElevatedButton(
+              onPressed: _isEnrolling ? null : () {
+                if (_characteristic == null) {
+                  _retrieveCharacteristic();
+                } else { // Change here
+                  _startEnrollment();
+                }
+              },
+              child: Text(_isEnrolling ? 'Enrolling...' : 'Start Enrollment'),
+            ),
+
+            SizedBox(height: 20.0),
+
+            // Enrollment Status
+            Text(_enrollmentStatus),
           ],
         ),
       ),
