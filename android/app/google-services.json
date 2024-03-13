@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "300940339260",
+    "project_id": "fyp-app-923a5",
+    "storage_bucket": "fyp-app-923a5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:300940339260:android:ba7865bf4501e74461bb39",
+        "android_client_info": {
+          "package_name": "com.example.ecg_app_fyp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "300940339260-8db4bo1hamqontupugsk0p101c6p6je7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARiwHORtPg421VA9HZIAWFwJxBjH08VnQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "300940339260-8db4bo1hamqontupugsk0p101c6p6je7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "300940339260-3cidoko47a0g1ojkolrbh3ccjmvgaeiv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ecgAppFyp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
