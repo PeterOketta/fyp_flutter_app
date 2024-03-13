@@ -5,31 +5,35 @@ import 'snackbar.dart';
 
 class BluetoothUtils {
   BluetoothCharacteristic? _targetCharacteristic;
-  Future<BluetoothCharacteristic?> findTargetCharacteristic(BluetoothDevice device) async {
+  Future<BluetoothCharacteristic?> findTargetCharacteristic(
+      BluetoothDevice device) async {
     try {
       await device.connect();
       print('Connected to device: ${device.name}');
 
       List<BluetoothService> services = await device.discoverServices();
       for (BluetoothService service in services) {
-        for (BluetoothCharacteristic characteristic in service.characteristics) {
-          if (characteristic.uuid.toString() == "b7981234-6189-d7a6-5241-39acc25f2471") {
+        for (BluetoothCharacteristic characteristic
+            in service.characteristics) {
+          if (characteristic.uuid.toString() ==
+              "b7981234-6189-d7a6-5241-39acc25f2471") {
             _targetCharacteristic = characteristic;
-            return characteristic;// Store globally
+            return characteristic; // Store globally
           }
         }
       }
 
       return null; // Characteristic not found
-
     } catch (e) {
       _showErrorSnackbar("Connect Error:", e);
       return null;
     }
   }
 
-  Future<List<int>> collectDataFromCharacteristic(Duration duration, BluetoothCharacteristic characteristic) async {
-    if (characteristic == null) { // Ensure characteristic is provided
+  Future<List<int>> collectDataFromCharacteristic(
+      Duration duration, BluetoothCharacteristic characteristic) async {
+    if (characteristic == null) {
+      // Ensure characteristic is provided
       throw Exception('Bluetooth characteristic not found.');
     }
 
@@ -49,8 +53,8 @@ class BluetoothUtils {
     });
 
     return collectedData;
-
   }
+
   List<int> _parseECGData(List<int> rawData) {
     rawData = rawData.sublist(1);
     List<int> parsedSamples = [];
@@ -61,8 +65,8 @@ class BluetoothUtils {
 
     return parsedSamples;
   }
+
   void _showErrorSnackbar(String prefix, dynamic error) {
     Snackbar.show(ABC.b, prettyException("$prefix", error), success: false);
   }
-
 }
