@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import '../utils/BluetoothUtils.dart';
+import '../utils/BluetoothManager.dart';
 import 'dart:io';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,12 +18,22 @@ class EnrollmentFunctions {
   if (endIndex > ecgData.length) endIndex = ecgData.length;
   segments.add(ecgData.sublist(i, endIndex));
   }
+  print('Segments: $segments');
   return segments;
   }
-
   Future<List> runInference(List<int> ecgSegment) async {
+    // Check if the interpreter is null, and load the model if needed
+    if (_interpreter == null) {
+      await loadModel('attention_model.tflite');
+    }
+
+    if (_interpreter == null) {
+      throw Exception('Failed to load the model.');
+    }
+
     // 1. Prepare Input (assuming Float32List for input)
     List<double> inputData = ecgSegment.map((value) => value.toDouble()).toList();
+    print('Input to model: $inputData');
     List<int> inputShape = _interpreter!.getInputTensor(0).shape;
     inputData = inputData.reshape(inputShape) as List<double>;
     var output = List.filled(150 * 128, 0).reshape([150, 128]);
@@ -31,15 +42,25 @@ class EnrollmentFunctions {
   }
 
 
-  Future<void> enrollUser(int duration, Function setStateCallback, BluetoothCharacteristic characteristic) async{
+  Future<void> enrollUser(int duration, Function setStateCallback) async {
     setStateCallback(true, 'Enrolling...');
     try {
-      // 2. Collect ECG Data
-      List<int> longECGSegment = await _bluetoothUtils.collectDataFromCharacteristic(Duration(seconds: duration), characteristic);
+      // Retrieve Bluetooth characteristic from BluetoothManager
+      BluetoothCharacteristic? characteristic =
+      BluetoothManager.getCharacteristic();
 
+      if (characteristic == null) {
+        throw Exception('Bluetooth characteristic not found.');
+      }
+
+      // 2. Collect ECG Data
+      List<int> longECGSegment =
+      await _bluetoothUtils.collectDataFromCharacteristic(
+          Duration(seconds: duration), characteristic);
+      print('Collected Data: $longECGSegment');
       // 3. Segmentation
-      List<List<int>> segments = segmentECGData(
-          longECGSegment, 200, 40) as List<List<int>>;
+      List<List<int>> segments = await segmentECGData(
+          longECGSegment, 200, 40);
 
       // 4. Model Inference (Repeated for each segment)
       List<double> accumulatedContextVectors = [];

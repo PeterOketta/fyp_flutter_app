@@ -142,9 +142,10 @@ class _ScanScreenState extends State<ScanScreen> {
 
       if (characteristic != null) {
         Navigator.of(context).pushNamed(
-            '/enroll',  // Or your enrollment screen route
-            arguments: {'characteristic': characteristic}
+          '/enroll',
+          arguments: {'characteristic': characteristic},
         );
+
       } else {
         // Handle the case where the characteristic couldn't be found
         Snackbar.show(ABC.b, "Charasteristic not found", success: false);

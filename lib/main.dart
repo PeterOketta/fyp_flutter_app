@@ -3,7 +3,7 @@ import 'HomePage.dart';
 import 'EnrollmentPage.dart';
 import 'VerificationPage.dart';
 import 'WelcomePage.dart';
-// import 'AccountSetupPage.dart';
+import 'AccountSetupPage.dart';
 import 'Re_enrollment.dart';
 import 'BluetoothPage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,8 +28,8 @@ class MyApp extends StatelessWidget {
         '/bluetooth-pairing': (context) => FlutterBlueApp(),
         '/enrollment': (context) => EnrollmentScreen(),
         '/re-enroll': (context) => ReEnrollmentPage(),
-        '/create-account': (context) => HomePage(),
-        // '/create-account': (context) => AccountSetupPage(),
+        // '/create-account': (context) => HomePage(),
+        '/create-account': (context) => AccountSetupPage(),
         '/verification': (context) => AuthenticationPage(),
         '/enroll': (context) => EnrollmentScreen(),
         '/profile': (context) => ProfileScreen(),

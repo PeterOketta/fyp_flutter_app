@@ -64,11 +64,9 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
       });
     }
   }
-
   void _navigateToProfile() {
     Navigator.pushNamed(context, '/profile', arguments: {'profileName': 'Mike', 'confidence': _confidence});
   }
-
   void _handleVerificationSuccess() => setState(() {
     _verified = true;
     _navigateToProfile();

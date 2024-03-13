@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'Enrollment_functions.dart';
 
+
 class EnrollmentScreen extends StatefulWidget {
   @override
   _EnrollmentScreenState createState() => _EnrollmentScreenState();
@@ -12,21 +13,13 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   String _enrollmentStatus = 'Ready to Start';
   BluetoothCharacteristic? _characteristic;
   final _enrollmentFunctions = EnrollmentFunctions();
-  @override
-  void initState() {
-    super.initState();
-  }
-  void _retrieveCharacteristic() {
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    _characteristic = args['characteristic'];
-  }
-
 
   void _startEnrollment() async {
-    _enrollmentFunctions.enrollUser(80,_updateEnrollmentStatus,_characteristic!);
+    _enrollmentFunctions.enrollUser(80, _updateEnrollmentStatus);
     if (_isEnrolling == false) {
       Navigator.pushReplacementNamed(context, '/profile');
     }
+
   }
 
   void _updateEnrollmentStatus(bool isEnrolling, String status) {
@@ -64,12 +57,10 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
 
             // Enrollment Button
             ElevatedButton(
-              onPressed: _isEnrolling ? null : () {
-                if (_characteristic == null) {
-                  _retrieveCharacteristic();
-                } else { // Change here
-                  _startEnrollment();
-                }
+              onPressed: _isEnrolling
+                  ? null
+                  : () {
+                _startEnrollment();
               },
               child: Text(_isEnrolling ? 'Enrolling...' : 'Start Enrollment'),
             ),

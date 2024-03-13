@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'snackbar.dart';
+import 'BluetoothManager.dart';
 
 class BluetoothUtils {
-  BluetoothCharacteristic? _targetCharacteristic;
   Future<BluetoothCharacteristic?> findTargetCharacteristic(
       BluetoothDevice device) async {
     try {
@@ -14,10 +13,10 @@ class BluetoothUtils {
       List<BluetoothService> services = await device.discoverServices();
       for (BluetoothService service in services) {
         for (BluetoothCharacteristic characteristic
-            in service.characteristics) {
+        in service.characteristics) {
           if (characteristic.uuid.toString() ==
               "b7981234-6189-d7a6-5241-39acc25f2471") {
-            _targetCharacteristic = characteristic;
+            BluetoothManager.setCharacteristic(characteristic);
             return characteristic; // Store globally
           }
         }
@@ -29,31 +28,50 @@ class BluetoothUtils {
       return null;
     }
   }
-
   Future<List<int>> collectDataFromCharacteristic(
       Duration duration, BluetoothCharacteristic characteristic) async {
     if (characteristic == null) {
-      // Ensure characteristic is provided
       throw Exception('Bluetooth characteristic not found.');
     }
 
     List<int> collectedData = [];
+    Completer<List<int>> completer = Completer<List<int>>();
 
-    // Set up listening and timer (using provided characteristic)
-    await characteristic.setNotifyValue(true);
-    Future.delayed(duration, () => characteristic.setNotifyValue(false));
+    // Initialize subscription with a no-op subscription
+    StreamSubscription<List<int>> subscription = StreamController<List<int>>.broadcast().stream.listen((_) {});
 
-    // Collect data
-    characteristic.value.listen((List<int>? value) {
-      if (value != null) {
-        collectedData.addAll(_parseECGData(value));
+    // Set up listening
+    subscription = characteristic.value.listen(
+          (List<int>? value) {
+        if (value != null) {
+          collectedData.addAll(_parseECGData(value));
+        }
+      },
+      onDone: () {
+        completer.complete(collectedData);
+        subscription.cancel(); // Cancel the subscription when done
+      },
+      onError: (error) {
+        completer.completeError(error);
+      },
+      cancelOnError: true,
+    );
+
+    // Set up timer
+    Future.delayed(duration, () {
+      if (!completer.isCompleted) {
+        subscription.cancel(); // Cancel the subscription if timer expires
+        completer.complete(collectedData);
       }
-    }, onError: (error) {
-      print('Error in characteristic value stream: $error');
     });
 
-    return collectedData;
+    // Enable notifications
+    await characteristic.setNotifyValue(true);
+
+    return completer.future;
   }
+
+
 
   List<int> _parseECGData(List<int> rawData) {
     rawData = rawData.sublist(1);
