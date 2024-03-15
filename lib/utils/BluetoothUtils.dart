@@ -71,8 +71,6 @@ class BluetoothUtils {
     return completer.future;
   }
 
-
-
   List<int> _parseECGData(List<int> rawData) {
     rawData = rawData.sublist(1);
     List<int> parsedSamples = [];

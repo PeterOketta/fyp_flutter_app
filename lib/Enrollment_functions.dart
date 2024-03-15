@@ -13,7 +13,7 @@ class EnrollmentFunctions {
 
   Future<void> loadModel() async {
     try {
-      final modelData = await rootBundle.load('assets/attention_model.tflite');
+      final modelData = await rootBundle.load('assets/output_attention_model.tflite');
       _interpreter = await Interpreter.fromBuffer(modelData.buffer.asUint8List());
       print('Model loaded successfully');
     } catch (e) {
