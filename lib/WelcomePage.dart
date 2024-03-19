@@ -30,7 +30,7 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             TextButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/bluetooth-pairing');
+                Navigator.pushNamed(context, '/verification');
               },
               child: const Text('I already have an account'),
             ),

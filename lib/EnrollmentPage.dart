@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'Enrollment_functions.dart';
-
 class EnrollmentScreen extends StatefulWidget {
   @override
   _EnrollmentScreenState createState() => _EnrollmentScreenState();
@@ -9,8 +7,8 @@ class EnrollmentScreen extends StatefulWidget {
 
 class _EnrollmentScreenState extends State<EnrollmentScreen> {
   bool _isEnrolling = false;
+  bool _enrollmentDone = false;
   String _enrollmentStatus = 'Ready to Start';
-  BluetoothCharacteristic? _characteristic;
   final _enrollmentFunctions = EnrollmentFunctions();
 
   @override
@@ -20,10 +18,10 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   }
 
   void _startEnrollment() async {
-    await _enrollmentFunctions.enrollUser(80, _updateEnrollmentStatus);
-    if (_isEnrolling == false) {
-      Navigator.pushReplacementNamed(context, '/profile');
-    }
+    await _enrollmentFunctions.enrollUser(90, _updateEnrollmentStatus);
+    setState(() {
+        _enrollmentDone = true;
+      });
   }
 
   void _updateEnrollmentStatus(bool isEnrolling, String status) {
@@ -31,6 +29,10 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
       _isEnrolling = isEnrolling;
       _enrollmentStatus = status;
     });
+  }
+
+  void _navigateToProfile() {
+    Navigator.pushReplacementNamed(context, '/profile');
   }
 
   @override
@@ -59,6 +61,13 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
             ),
             SizedBox(height: 20.0),
             Text(_enrollmentStatus),
+            Visibility(
+              visible: _enrollmentDone,
+              child: ElevatedButton(
+                onPressed: _navigateToProfile,
+                child: Text('Continue'),
+              ),
+            ),
           ],
         ),
       ),
