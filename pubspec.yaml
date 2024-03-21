@@ -74,6 +74,10 @@ flutter:
     - assets/output_attention_model.tflite
     - assets/output_attention.tflite
     - assets/HLSTM_converted_model.onnx
+    - assets/biometrics image.png
+    - assets/profile_pic.png
+    - assets/placement.png
+    - assets/sensor_placement.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

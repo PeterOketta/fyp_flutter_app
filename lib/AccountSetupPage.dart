@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AccountSetupPage extends StatefulWidget {
+  const AccountSetupPage({super.key});
+
   @override
   _AccountSetupPageState createState() => _AccountSetupPageState();
 }
@@ -14,29 +16,26 @@ class _AccountSetupPageState extends State<AccountSetupPage> {
   final _confirmPasswordController = TextEditingController();
 
   // Submission flag (optional)
-  bool _isSubmitting = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Account'),
+        title: const Text('Create Account'),
       ),
       body: SingleChildScrollView( // Make the content scrollable if necessary
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               // Image (Placeholder)
               // Image.asset('assets/images/ecg_logo.png', height: 150),
-
               // SizedBox(height: 20.0),
-
               // Email Text Field
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(labelText: 'Email'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   // Basic email validation
@@ -50,12 +49,12 @@ class _AccountSetupPageState extends State<AccountSetupPage> {
                 },
               ),
 
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
 
               // Password Text Field
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
                   // Basic password validation
@@ -69,12 +68,12 @@ class _AccountSetupPageState extends State<AccountSetupPage> {
                 },
               ),
 
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
 
               // Confirm Password Text Field
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(labelText: 'Confirm Password'),
+                decoration: const InputDecoration(labelText: 'Confirm Password'),
                 obscureText: true,
                 validator: (value) {
                   // Confirm password match
@@ -88,13 +87,13 @@ class _AccountSetupPageState extends State<AccountSetupPage> {
                 },
               ),
 
-              SizedBox(height: 20.0),
+              const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
                   // Execute authentication model logic (to be implemented)
-                  Navigator.pushNamed(context, '/bluetooth-pairing');
+                  Navigator.pushNamed(context, '/re-enroll');
                 },
-                child: Text('Create Account'),
+                child: const Text('Create Account'),
               ),
               // Create Account Button
               // ElevatedButton(

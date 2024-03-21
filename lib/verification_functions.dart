@@ -32,7 +32,6 @@ class ECGVerification {
       if (endIndex > ecgData.length) endIndex = ecgData.length;
       segments.add(ecgData.sublist(i, endIndex));
     }
-    print('Segments: $segments');
     return segments;
   }
 
@@ -51,8 +50,7 @@ class ECGVerification {
         return values.map((value) => double.parse(value)).toList();
       }).toList();
 
-      // Print the loaded template
-      print('Loaded iECG template: $iecgTemplate');
+
     } catch (error) {
       print('Error loading iECG template: $error');
       // Handle the error (e.g., display feedback to the user)
@@ -110,9 +108,9 @@ class ECGVerification {
     }
 
     // Release the OrtValue objects
-    outputs.forEach((element) {
+    for (var element in outputs) {
       element?.release();
-    });
+    }
 
     return result;
   }
@@ -135,8 +133,6 @@ class ECGVerification {
   // Cosine Similarity Function
   // Cosine Similarity Function
   double _cosineSimilarity(List<double> vector1, List<double> vector2) {
-    print('Length of vector1: ${vector1.length}');
-    print('Length of vector2: ${vector2.length}');
     
     assert(vector1.length == vector2.length, "Vectors must have the same length");
 

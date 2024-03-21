@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'Enrollment_functions.dart';
 class EnrollmentScreen extends StatefulWidget {
+  const EnrollmentScreen({super.key});
+
   @override
   _EnrollmentScreenState createState() => _EnrollmentScreenState();
 }
@@ -18,7 +20,7 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   }
 
   void _startEnrollment() async {
-    await _enrollmentFunctions.enrollUser(90, _updateEnrollmentStatus);
+    await _enrollmentFunctions.enrollUser(65, _updateEnrollmentStatus);
     setState(() {
         _enrollmentDone = true;
       });
@@ -38,34 +40,42 @@ class _EnrollmentScreenState extends State<EnrollmentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Create Your ECG Profile'),
+        backgroundColor: Colors.black,
+        title: const Text('Create Your ECG Profile'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Place the sensor on your garment as shown.',
+            const Text(
+              'Place on your garment as shown.',
               style: TextStyle(fontSize: 16.0),
             ),
-            SizedBox(height: 20.0),
-            Text(
+            const SizedBox(height: 20.0),
+            Image.asset(
+              'assets/sensor_placement.png', 
+              width: 250, 
+              height: 250, 
+            ), 
+            const SizedBox(height: 20.0),
+            const Text(
               'Bluetooth: Connected',
               style: TextStyle(fontSize: 16.0),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: _isEnrolling ? null : _startEnrollment,
               child: Text(_isEnrolling ? 'Enrolling...' : 'Start Enrollment'),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             Text(_enrollmentStatus),
             Visibility(
               visible: _enrollmentDone,
               child: ElevatedButton(
                 onPressed: _navigateToProfile,
-                child: Text('Continue'),
+                child: const Text('Continue'),
               ),
             ),
           ],

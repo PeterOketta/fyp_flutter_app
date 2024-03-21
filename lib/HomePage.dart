@@ -4,7 +4,7 @@ class ProfileScreen extends StatelessWidget {
   // Allow optional parameter
   final String? profileName;
 
-  const ProfileScreen({Key? key, this.profileName}) : super(key: key);
+  const ProfileScreen({super.key, this.profileName});
 
   @override
   Widget build(BuildContext context) {
@@ -14,16 +14,22 @@ class ProfileScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Welcome, ${profileName ?? 'User'}!", // Use 'User' if profileName is null
-              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+              "Welcome", 
+              style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20.0),
+            Image.asset(
+              'assets/profile_pic.png', 
+              width: 250, 
+              height: 250, 
+            ), 
+            const SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: () {
                 // Handle the "Record" button press
                 // ... (e.g., navigate to recording screen)
               },
-              child: Text('Record'),
+              child: const Text('Record'),
             ),
           ],
         ),

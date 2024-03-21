@@ -13,10 +13,12 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,15 +26,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       initialRoute: '/',
       routes: {
-        '/': (context) => WelcomeScreen(),
-        '/bluetooth-pairing': (context) => FlutterBlueApp(),
-        '/enrollment': (context) => EnrollmentScreen(),
-        '/re-enroll': (context) => ReEnrollmentPage(),
+        '/': (context) => const WelcomeScreen(),
+        '/bluetooth-pairing': (context) => const FlutterBlueApp(),
+        '/enrollment': (context) => const EnrollmentScreen(),
+        '/re-enroll': (context) => const ReEnrollmentPage(),
         // '/create-account': (context) => HomePage(),
-        '/create-account': (context) => AccountSetupPage(),
-        '/verification': (context) => AuthenticationPage(),
-        '/enroll': (context) => EnrollmentScreen(),
-        '/profile': (context) => ProfileScreen(),
+        '/create-account': (context) => const AccountSetupPage(),
+        '/verification': (context) => const AuthenticationPage(),
+        '/enroll': (context) => const EnrollmentScreen(),
+        '/profile': (context) => const ProfileScreen(),
       },
     );
   }

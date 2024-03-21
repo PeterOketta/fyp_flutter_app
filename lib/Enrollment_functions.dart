@@ -10,7 +10,7 @@ import 'package:onnxruntime/onnxruntime.dart';
 
 class EnrollmentFunctions {
   OrtSession? _ortSession;
-  BluetoothUtils _bluetoothUtils = BluetoothUtils();
+  final BluetoothUtils _bluetoothUtils = BluetoothUtils();
 
   Future<void> loadModel() async {
     try {
@@ -34,7 +34,6 @@ class EnrollmentFunctions {
       if (endIndex > ecgData.length) endIndex = ecgData.length;
       segments.add(ecgData.sublist(i, endIndex));
     }
-    print('Segments: $segments');
     return segments;
   }
 
@@ -67,7 +66,7 @@ class EnrollmentFunctions {
     runOptions.release();
 
     // Process the outputs and convert them to the desired format
-    final result = <List<double>>[];
+    final List<List<double>> result = [];
     for (final outputData in outputs![0]?.value as List<List<List<double>>>) {
       for (final row in outputData) {
         result.add(row);
@@ -75,9 +74,9 @@ class EnrollmentFunctions {
     }
 
     // Release the OrtValue objects
-    outputs.forEach((element) {
+    for (var element in outputs) {
       element?.release();
-    });
+    }
 
     return result;
   }
@@ -93,29 +92,26 @@ class EnrollmentFunctions {
       }
 
       List<int> longECGSegment = await _bluetoothUtils.collectDataFromCharacteristic(Duration(seconds: duration), characteristic);
-      print('Collected Data: $longECGSegment');
 
-      List<List<int>> segments = await segmentECGData(longECGSegment, 200, 40);
+      List<List<int>> segments = await segmentECGData(longECGSegment, 200, 32);
 
       List<List<List<double>>> accumulatedContextVectors = [];
       int enrollmentSegmentsCount = 0;
-      const enrollmentThreshold = 40;
+      const enrollmentThreshold = 30;
 
       while (enrollmentSegmentsCount < enrollmentThreshold && segments.isNotEmpty) {
         List<int> segment = segments.removeAt(0);
-        print('Segment before inference: $segment');
         List<List<double>> contextVector = await runInference(segment);
-        print('Context vector: $contextVector');
         accumulatedContextVectors.add(contextVector);
 
         enrollmentSegmentsCount += 1;
 
-        setStateCallback(true, 'Enrolling (${enrollmentSegmentsCount * 100 ~/ enrollmentThreshold}%');
+        setStateCallback(true, 'Enrolling (${enrollmentSegmentsCount * 100 ~/ enrollmentThreshold}%)');
       }
 
       if (enrollmentSegmentsCount == enrollmentThreshold) {
         print('Calculating iECG...');
-        List<List<double>> iecg = calculateIECG(accumulatedContextVectors);
+        List<List<double>> iecg = await calculateIECG(accumulatedContextVectors);
 
         // Save iECG template to file
         await saveIECGTemplate(iecg);
@@ -143,7 +139,7 @@ class EnrollmentFunctions {
       throw Exception('Error storing iECG: $error');
     }
   }
-List<List<double>> calculateIECG(List<List<List<double>>> contextVectors) {
+Future<List<List<double>>> calculateIECG(List<List<List<double>>> contextVectors) async {
   if (contextVectors.isEmpty) {
     throw Exception('Cannot calculate iECG with no context vectors');
   }
@@ -170,15 +166,8 @@ List<List<double>> calculateIECG(List<List<List<double>>> contextVectors) {
     }
   }
 
-  // Print the shape of the calculated iECG template
-  print('Shape of iECG template: ${iecg.length} x ${iecg[0].length}');
-
   return iecg;
 }
-
-
-
-
 
 
 

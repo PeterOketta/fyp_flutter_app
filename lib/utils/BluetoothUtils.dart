@@ -30,10 +30,6 @@ class BluetoothUtils {
   }
   Future<List<int>> collectDataFromCharacteristic(
       Duration duration, BluetoothCharacteristic characteristic) async {
-    if (characteristic == null) {
-      throw Exception('Bluetooth characteristic not found.');
-    }
-
     List<int> collectedData = [];
     Completer<List<int>> completer = Completer<List<int>>();
 
@@ -83,6 +79,6 @@ class BluetoothUtils {
   }
 
   void _showErrorSnackbar(String prefix, dynamic error) {
-    Snackbar.show(ABC.b, prettyException("$prefix", error), success: false);
+    Snackbar.show(ABC.b, prettyException(prefix, error), success: false);
   }
 }

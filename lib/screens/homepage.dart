@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_button/sign_in_button.dart';
@@ -69,8 +68,8 @@ class _HomePageState extends State<HomePage> {
           Text(_user!.displayName ?? ""),
           MaterialButton(
             color: Colors.red,
-            child: const Text('Sign Out'),
             onPressed: _auth.signOut,
+            child: const Text('Sign Out'),
           )
         ],
       ),
@@ -79,8 +78,8 @@ class _HomePageState extends State<HomePage> {
 
   void _handleGooglegSignIn() {
     try {
-      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
-      _auth.signInWithProvider(_googleAuthProvider);
+      GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
+      _auth.signInWithProvider(googleAuthProvider);
     } catch (error) {
       print(error);
     }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ReEnrollmentPage extends StatefulWidget {
+  const ReEnrollmentPage({super.key});
+
   @override
   _ReEnrollmentPageState createState() => _ReEnrollmentPageState();
 }
@@ -20,25 +22,25 @@ class _ReEnrollmentPageState extends State<ReEnrollmentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Re-enrollment Verification')),
+      appBar: AppBar(title: const Text('Re-enrollment Verification')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _verificationNumberController,
-              decoration: InputDecoration(labelText: 'Verification Number'),
+              decoration: const InputDecoration(labelText: 'Verification Number'),
             ),
             ElevatedButton(
               onPressed: _verifyNumber,
-              child: Text('Verify and Re-enroll'),
+              child: const Text('Verify and Re-enroll'),
             ),
             ElevatedButton(
               onPressed: () {
                 // Execute authentication model logic (to be implemented)
                 Navigator.pushNamed(context, '/enroll');
               },
-              child: Text('For now'),
+              child: const Text('For now'),
             ),
             // ... Display loading or error messages if needed
           ],
